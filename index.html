@@ -229,8 +229,12 @@
     }
     .fill, td.col-note input{ color:#000; }
     .fill{ border-bottom:1px dotted #000; }
+    /* ตอนพิมพ์: ช่องที่ยังไม่กรอกให้ว่าง (ไม่แสดง placeholder) */
+    input::placeholder, textarea::placeholder{ color:transparent !important; opacity:0 !important; }
+    /* checkbox ที่ไม่ได้ติ๊กให้พิมพ์เป็นช่องว่าง ไม่มีกรอบทึบ */
+    td.col-st input[type="checkbox"]{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     table.cl thead th{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    tr.grp td, table.cl thead th, .chief-box{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    tr.grp td, table.cl thead th, .ack-box{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   }
 </style>
 </head>
@@ -314,9 +318,7 @@
     <div class="sign-box"></div>
     <div class="sign-box">
       <div class="sign-line">ลงชื่อ <input class="fill" data-field="signSender" placeholder="ผู้ส่ง"> ผู้ส่ง</div>
-      <div class="sign-caption">( <input class="fill" data-field="signSenderName" style="min-width:160px"> )</div>
       <div class="sign-line">ลงชื่อ <input class="fill" data-field="signReceiver" placeholder="ผู้รับ"> ผู้รับ</div>
-      <div class="sign-caption">( <input class="fill" data-field="signReceiverName" style="min-width:160px"> )</div>
     </div>
   </div>
 
