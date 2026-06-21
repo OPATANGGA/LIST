@@ -124,9 +124,10 @@
     padding:0 4px;
     min-width:40px;
     text-align:center;
-    vertical-align:baseline;
-    line-height:1.35;
+    box-sizing:border-box;
+    vertical-align:bottom;   /* จัดขอบล่าง (เส้นใต้) ให้ตรงแนวกันทุกช่อง */
     height:1.5em;
+    line-height:1.5em;
   }
   .fill:focus{ outline:none; border-bottom-color:var(--accent); background:#eef5ff; }
   .fill.name{ min-width:230px; text-align:left; }
@@ -142,6 +143,9 @@
     background-image:none;
     padding:0 4px;
     width:58px;
+    height:1.5em;
+    line-height:1.5em;
+    vertical-align:bottom;
   }
   select.fill::-ms-expand{ display:none; }
 
@@ -244,8 +248,9 @@
     .fill{ border-bottom:1px dotted #000; }
     /* ตอนพิมพ์: ช่องที่ยังไม่กรอกให้ว่าง (ไม่แสดง placeholder) */
     input::placeholder, textarea::placeholder{ color:transparent !important; opacity:0 !important; }
-    /* checkbox ที่ไม่ได้ติ๊กให้พิมพ์เป็นช่องว่าง ไม่มีกรอบทึบ */
+    /* ช่องที่ไม่ได้ติ๊ก: ตอนพิมพ์ให้ซ่อนกล่องว่างออกไป เหลือเฉพาะช่องที่ติ๊กถูก */
     td.col-st input[type="checkbox"]{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    td.col-st input[type="checkbox"]:not(:checked){ display:none !important; }
     /* ตัดลูกศร dropdown เดือนตอนพิมพ์ ให้เป็นเส้นเดียวกับช่องอื่น */
     select.fill{ -webkit-appearance:none; -moz-appearance:none; appearance:none; background:transparent; }
     table.cl thead th{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
@@ -397,6 +402,10 @@ const CHECKLIST = [
 
 const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
+/* เดือนปัจจุบัน (แบบย่อภาษาไทย) */
+function currentThaiMonth(){ return THAI_MONTHS[new Date().getMonth()]; }
+
+
 /* ---------- สร้างตาราง Check-list ---------- */
 function buildChecklist(){
   const body = document.getElementById('clBody');
@@ -445,9 +454,13 @@ function buildMonths(){
     sel.innerHTML = '<option value=""> </option>' +
       THAI_MONTHS.map(m=>`<option value="${m}">${m}</option>`).join('');
   });
-  // ค่าเริ่มต้นตามต้นฉบับ
-  document.querySelector('select[data-field="startMonth"]').value = 'เม.ย.';
-  document.querySelector('select[data-field="endMonth"]').value   = 'พ.ค.';
+  // ค่าเริ่มต้น = เดือนปัจจุบัน
+  const cm = currentThaiMonth();
+  document.querySelector('select[data-field="startMonth"]').value = cm;
+  document.querySelector('select[data-field="endMonth"]').value   = cm;
+  ['ack1Date','ack2Date','ack3Date'].forEach(f=>{
+    document.querySelector(`[data-field="${f}"]`).value = `........./${cm}/๖๙`;
+  });
 }
 
 /* =======================================================================
@@ -509,10 +522,11 @@ function clearForm(resetDefaults=true){
     document.querySelector('[data-field="endYear"]').value   = '๖๙';
     document.querySelector('[data-field="startTime"]').value = '๐๘๐๐';
     document.querySelector('[data-field="endTime"]').value   = '๐๘๐๐';
-    document.querySelector('select[data-field="startMonth"]').value = 'เม.ย.';
-    document.querySelector('select[data-field="endMonth"]').value   = 'พ.ค.';
+    const cm = currentThaiMonth();
+    document.querySelector('select[data-field="startMonth"]').value = cm;
+    document.querySelector('select[data-field="endMonth"]').value   = cm;
     ['ack1Date','ack2Date','ack3Date'].forEach(f=>{
-      document.querySelector(`[data-field="${f}"]`).value = '........./เม.ย./๖๙';
+      document.querySelector(`[data-field="${f}"]`).value = `........./${cm}/๖๙`;
     });
   }
 }
