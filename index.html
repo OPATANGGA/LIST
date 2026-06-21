@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สมุดรายงานผลการปฏิบัติหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ ฯ</title>
+
+<!-- ฟอนต์ไทยทางการ Sarabun -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ ตั้งค่ากระดาษพิมพ์ A4 ============ */
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  :root{
+    --ink:#000;
+    --line:#222;
+    --muted:#555;
+    --accent:#0d3b66;
+    --paper:#ffffff;
+    --desk:#9aa1a9;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    font-family:'Sarabun','TH Sarabun New','Tahoma',sans-serif;
+    color:var(--ink);
+  }
+
+  /* พื้นหลังโต๊ะสีเทาเมื่อดูบนจอ */
+  body{
+    background:var(--desk);
+    padding:24px 0;
+  }
+
+  /* ============ แผ่นกระดาษ A4 ============ */
+  .a4-page{
+    width:210mm;
+    min-height:297mm;
+    margin:0 auto;
+    background:var(--paper);
+    padding:15mm;
+    box-shadow:0 0 14px rgba(0,0,0,.35);
+    position:relative;
+    /* บีบเนื้อหาให้พอดี 1 หน้า */
+    font-size:13.2px;
+    line-height:1.35;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ============ แถบเครื่องมือ (ฐานข้อมูล) — ไม่พิมพ์ ============ */
+  .toolbar{
+    width:210mm;
+    margin:0 auto 16px auto;
+    background:#1f2933;
+    color:#fff;
+    border-radius:8px;
+    padding:12px 16px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  .toolbar h2{
+    font-size:14px;
+    margin:0 12px 0 0;
+    font-weight:600;
+    flex:0 0 100%;
+  }
+  .toolbar button, .toolbar select{
+    font-family:inherit;
+    font-size:13px;
+    padding:6px 12px;
+    border-radius:6px;
+    border:1px solid #3a4754;
+    cursor:pointer;
+  }
+  .toolbar button{
+    background:#0d3b66;
+    color:#fff;
+    border-color:#0d3b66;
+  }
+  .toolbar button:hover{ background:#155090; }
+  .toolbar button.danger{ background:#922; border-color:#922; }
+  .toolbar button.ghost{ background:transparent; color:#cfd6dd; }
+  .toolbar select{ background:#fff; color:#000; min-width:230px; }
+  .toolbar .spacer{ flex:1; }
+  .toolbar .hint{ font-size:11.5px; color:#9fb0c0; flex:0 0 100%; }
+
+  /* ============ หัวเอกสาร ============ */
+  .doc-title{
+    text-align:center;
+    font-weight:700;
+    font-size:16px;
+    margin:0 0 2px 0;
+  }
+  .doc-sub{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+    margin:0 0 8px 0;
+  }
+
+  .lead{ margin:2px 0; }
+  .lead.indent{ text-indent:2.5em; }
+
+  /* ช่องกรอกแบบเส้นใต้ (ดูเหมือนจุดไข่ปลาในต้นฉบับ) */
+  .fill{
+    border:none;
+    border-bottom:1px dotted #333;
+    font-family:inherit;
+    font-size:inherit;
+    color:var(--accent);
+    background:transparent;
+    padding:0 4px;
+    min-width:40px;
+    text-align:center;
+  }
+  .fill:focus{ outline:none; border-bottom-color:var(--accent); background:#eef5ff; }
+  .fill.name{ min-width:230px; text-align:left; }
+  .fill.w-date{ width:46px; }
+  .fill.w-year{ width:40px; }
+  .fill.w-time{ width:60px; }
+  select.fill{ text-align:left; }
+
+  /* ============ ตาราง Check-list ============ */
+  table.cl{
+    width:100%;
+    border-collapse:collapse;
+    margin:6px 0 4px 0;
+    font-size:12.6px;
+  }
+  table.cl th, table.cl td{
+    border:1px solid var(--line);
+    padding:1.5px 5px;
+    vertical-align:middle;
+  }
+  table.cl thead th{
+    background:#e9eef4;
+    text-align:center;
+    font-weight:600;
+    line-height:1.15;
+  }
+  .col-no{ width:34px; text-align:center; }
+  .col-st{ width:54px; text-align:center; }
+  .col-note{ width:120px; }
+  td.col-no{ text-align:center; }
+  td.col-st{ text-align:center; }
+
+  /* แถวหัวข้อหลัก */
+  tr.grp td{ font-weight:600; background:#f6f8fb; }
+  /* รายการย่อย */
+  td.item{ padding-left:6px; }
+
+  /* ติ๊กสถานภาพ */
+  td.col-st input[type="radio"]{
+    width:14px; height:14px; cursor:pointer; margin:0;
+  }
+  /* ช่องหมายเหตุในตาราง */
+  td.col-note input{
+    width:100%;
+    border:none;
+    font-family:inherit;
+    font-size:12px;
+    background:transparent;
+  }
+  td.col-note input:focus{ outline:none; background:#eef5ff; }
+
+  /* ============ ส่วนท้าย / ลงนาม ============ */
+  .footer-text{ margin-top:6px; }
+  .sign-area{
+    margin-top:auto;
+    padding-top:10px;
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+  }
+  .sign-box{ width:48%; }
+  .sign-box .role{ font-weight:600; margin-bottom:4px; font-size:12.5px; }
+  .sign-line{ margin:10px 0 2px 0; }
+  .sign-line .fill{ min-width:170px; }
+  .sign-caption{ font-size:11.5px; color:var(--muted); text-align:center; }
+
+  /* กล่องหัวหน้าตรวจ/เซ็นเช็ค */
+  .chief-box{
+    margin-top:10px;
+    border:1px dashed #555;
+    border-radius:6px;
+    padding:6px 10px;
+    background:#fbfcfe;
+  }
+  .chief-box .role{ font-weight:600; color:#922; font-size:12.5px; }
+  .chief-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:3px; }
+  .chk-inline{ display:inline-flex; align-items:center; gap:5px; }
+
+  /* ============ การพิมพ์ ============ */
+  @media print{
+    body{ background:#fff; padding:0; }
+    .no-print{ display:none !important; }
+    .a4-page{
+      width:auto;
+      min-height:auto;
+      margin:0;
+      padding:0;
+      box-shadow:none;
+      font-size:12.6px;
+    }
+    .fill, td.col-note input{ color:#000; }
+    .fill{ border-bottom:1px dotted #000; }
+    table.cl thead th{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    tr.grp td, table.cl thead th, .chief-box{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================================= -->
+<!-- แถบเครื่องมือฐานข้อมูล (เก็บ/ดึงข้อมูล) — ไม่แสดงตอนพิมพ์ -->
+<!-- ========================================================= -->
+<div class="toolbar no-print">
+  <h2>📋 ระบบสมุดรายงานผลการปฏิบัติหน้าที่ — จัดเก็บฐานข้อมูล</h2>
+
+  <label style="font-size:13px;">เลือกรายงานที่บันทึกไว้:</label>
+  <select id="recordSelect"><option value="">— ยังไม่ได้เลือก —</option></select>
+  <button id="btnLoad" type="button">↧ ดึงข้อมูล</button>
+  <button id="btnDelete" type="button" class="danger">🗑 ลบ</button>
+
+  <span class="spacer"></span>
+
+  <button id="btnSave" type="button">💾 บันทึกลงฐานข้อมูล</button>
+  <button id="btnNew" type="button" class="ghost">＋ ฟอร์มใหม่</button>
+  <button id="btnExport" type="button" class="ghost">⤓ ส่งออก JSON</button>
+  <button id="btnImport" type="button" class="ghost">⤒ นำเข้า JSON</button>
+  <button id="btnPrint" type="button">🖨 พิมพ์ / บันทึก PDF</button>
+  <input type="file" id="fileImport" accept="application/json" style="display:none">
+
+  <div class="hint">บันทึกข้อมูลในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล สามารถบันทึก ดึงกลับมาแก้ไข และส่งออกเป็นไฟล์ JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้</div>
+</div>
+
+<!-- ========================================================= -->
+<!-- แผ่นกระดาษ A4 -->
+<!-- ========================================================= -->
+<div class="a4-page" id="page">
+
+  <div class="doc-title">สมุดรายงานผลการปฏิบัติหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ ฯ</div>
+  <div class="doc-sub">กองข่าวอากาศ คปอ. (กขอ.คปอ.)</div>
+
+  <!-- ===== ส่วนหัวฟอร์ม / ส่วนเจ้าหน้าที่ผู้ปฏิบัติงาน ===== -->
+  <p class="lead"><strong>เรียน</strong> น.สารสนเทศข้อมูลข่าวอากาศ ฯ</p>
+
+  <p class="lead indent">
+    กระผม <input class="fill name" data-field="officerName" placeholder="ยศ–ชื่อ–สกุล">
+    ได้รับมอบหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ
+  </p>
+  <p class="lead">
+    เมื่อวันที่ <input class="fill w-date" data-field="startDay" placeholder="๐๐">
+    <select class="fill" data-field="startMonth"></select>
+    <input class="fill w-year" data-field="startYear" value="๖๙">
+    เวลา <input class="fill w-time" data-field="startTime" value="๐๘๐๐">
+    ขอรายงานผลการปฏิบัติในขณะปฏิบัติหน้าที่ให้ทราบ ดังนี้
+  </p>
+
+  <!-- ===== ตาราง Check-list ===== -->
+  <table class="cl">
+    <thead>
+      <tr>
+        <th class="col-no" rowspan="2">ลำดับ</th>
+        <th rowspan="2">รายการ</th>
+        <th class="col-st" colspan="2">สถานภาพ</th>
+        <th class="col-note" rowspan="2">หมายเหตุ</th>
+      </tr>
+      <tr>
+        <th class="col-st">ใช้ได้</th>
+        <th class="col-st">ใช้ไม่ได้</th>
+      </tr>
+    </thead>
+    <tbody id="clBody"><!-- สร้างด้วย JavaScript --></tbody>
+  </table>
+
+  <!-- ===== ส่วนท้ายฟอร์ม / ส่งมอบหน้าที่ ===== -->
+  <p class="lead footer-text">
+    ครั้นถึงวันที่ <input class="fill w-date" data-field="endDay" placeholder="๐๐">
+    <select class="fill" data-field="endMonth"></select>
+    <input class="fill w-year" data-field="endYear" value="๖๙">
+    เวลา <input class="fill w-time" data-field="endTime" value="๐๘๐๐">
+  </p>
+  <p class="lead">
+    กระผมได้มอบหน้าที่ความรับผิดชอบให้กับ
+    <input class="fill name" data-field="receiverName" placeholder="ยศ–ชื่อ–สกุล ผู้รับมอบ">
+    เพื่อปฏิบัติหน้าที่ต่อไป
+  </p>
+
+  <!-- ===== ช่องลงชื่อ ผู้ส่ง / ผู้รับ (เจ้าหน้าที่ปฏิบัติงาน) ===== -->
+  <div class="sign-area">
+    <div class="sign-box"></div>
+    <div class="sign-box">
+      <div class="sign-line">ลงชื่อ <input class="fill" data-field="signSender" placeholder="ผู้ส่ง"> ผู้ส่ง</div>
+      <div class="sign-caption">( <input class="fill" data-field="signSenderName" style="min-width:160px"> )</div>
+      <div class="sign-line">ลงชื่อ <input class="fill" data-field="signReceiver" placeholder="ผู้รับ"> ผู้รับ</div>
+      <div class="sign-caption">( <input class="fill" data-field="signReceiverName" style="min-width:160px"> )</div>
+    </div>
+  </div>
+
+  <!-- ===== ส่วนหัวหน้า ตรวจสอบ / เซ็นเช็ค ===== -->
+  <div class="chief-box">
+    <span class="role">สำหรับหัวหน้า / น.สารสนเทศ ฯ ตรวจสอบและลงนาม</span>
+    <div class="chief-row">
+      <label class="chk-inline">
+        <input type="checkbox" data-field="chiefChecked"> ตรวจสอบรายงานแล้ว
+      </label>
+      <span>ความเห็น:
+        <input class="fill" data-field="chiefRemark" style="min-width:300px" placeholder="ความเห็น / ข้อสั่งการ">
+      </span>
+      <span>ลงชื่อ
+        <input class="fill" data-field="chiefSign" style="min-width:170px" placeholder="หัวหน้า ผู้ตรวจ">
+      </span>
+      <span>วันที่
+        <input class="fill" data-field="chiefDate" style="min-width:90px" placeholder="วัน/เดือน/ปี">
+      </span>
+    </div>
+  </div>
+
+</div><!-- /.a4-page -->
+
+<script>
+/* =======================================================================
+   ข้อมูลรายการ Check-list  (type: grp = หัวข้อหลักไม่มีสถานภาพ, item = มีสถานภาพ)
+   ======================================================================= */
+const CHECKLIST = [
+  {no:'๑', type:'grp',  text:'ระบบบริการข่าวอากาศเพื่อการบิน (AWSS)'},
+  {no:'',  type:'item', id:'r1_1', text:'๑.๑ โปรแกรมเข้าสู่ระบบ ฯ (Login)'},
+  {no:'',  type:'item', id:'r1_2', text:'๑.๒ โปรแกรมบันทึก และแสดงผลข้อมูลข่าวอากาศ'},
+  {no:'',  type:'item', id:'r1_3', text:'๑.๓ โปรแกรมบันทึก และแสดงผลแผนที่อากาศ'},
+  {no:'',  type:'item', id:'r1_4', text:'๑.๔ โปรแกรมรายงานสถานะระบบฯ และจัดการผู้ใช้งาน'},
+
+  {no:'๒', type:'grp',  text:'ระบบเครือข่าย'},
+  {no:'',  type:'item', id:'r2_1', text:'๒.๑ เครือข่าย ทอ. Intranet'},
+  {no:'',  type:'item', id:'r2_2', text:'๒.๒ เครือข่าย ทรู Internet'},
+
+  {no:'๓', type:'item', id:'r3', text:'ตรวจสอบอุปกรณ์รักษาความปลอดภัยเครือข่าย (Firewall)'},
+
+  {no:'๔', type:'grp',  text:'อุปกรณ์เครือข่าย'},
+  {no:'',  type:'item', id:'r4_1', text:'๔.๑ HP 1920-24G L2,L3 Switch ผสท.กขอ.คปอ. (จำนวน)'},
+  {no:'',  type:'item', id:'r4_2', text:'๔.๒ HP 1620-24G L2 Switch นขต.กขอ.คปอ. (จำนวน)'},
+
+  {no:'๕', type:'grp',  text:'การแจ้งเตือนสภาพอากาศ รูปแบบกราฟฟิก'},
+  {no:'',  type:'item', id:'r5_1', text:'๕.๑ AWSS'},
+  {no:'',  type:'item', id:'r5_2', text:'๕.๒ ทสส.คปอ.'},
+  {no:'',  type:'item', id:'r5_3', text:'๕.๓ Line APP'},
+
+  {no:'๖', type:'item', id:'r6', text:'ตรวจสอบระบบ E-learning'},
+  {no:'๗', type:'item', id:'r7', text:'ตรวจสอบการใช้งานหนังสืออิเล็กทรอนิกส์ (E-books)'},
+  {no:'๘', type:'item', id:'r8', text:'เว็บไซต์ กขอ.คปอ.'},
+  {no:'๙', type:'item', id:'r9', text:'ระบบรับข้อมูลจาก บ.วิทยุการบิน (AMHS)'},
+
+  {no:'',  type:'other', id:'o1', text:'อื่นๆ'},
+];
+
+const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+/* ---------- สร้างตาราง Check-list ---------- */
+function buildChecklist(){
+  const body = document.getElementById('clBody');
+  let html = '';
+  for(const row of CHECKLIST){
+    if(row.type === 'grp'){
+      html += `<tr class="grp">
+        <td class="col-no">${row.no}</td>
+        <td colspan="4">${row.text}</td>
+      </tr>`;
+    } else if(row.type === 'other'){
+      html += `<tr>
+        <td class="col-no">${row.no}</td>
+        <td class="item">${row.text}
+          <input class="fill" data-field="${row.id}" style="min-width:430px;border-bottom:1px dotted #333"></td>
+        <td class="col-st"></td>
+        <td class="col-st"></td>
+        <td class="col-note"></td>
+      </tr>`;
+    } else {
+      html += `<tr>
+        <td class="col-no">${row.no}</td>
+        <td class="item">${row.text}</td>
+        <td class="col-st"><input type="radio" name="st_${row.id}" data-status="${row.id}" value="ok"></td>
+        <td class="col-st"><input type="radio" name="st_${row.id}" data-status="${row.id}" value="ng"></td>
+        <td class="col-note"><input type="text" data-note="${row.id}"></td>
+      </tr>`;
+    }
+  }
+  body.innerHTML = html;
+}
+
+/* ---------- เติม dropdown เดือน ---------- */
+function buildMonths(){
+  document.querySelectorAll('select[data-field="startMonth"],select[data-field="endMonth"]').forEach(sel=>{
+    sel.innerHTML = '<option value=""> </option>' +
+      THAI_MONTHS.map(m=>`<option value="${m}">${m}</option>`).join('');
+  });
+  // ค่าเริ่มต้นตามต้นฉบับ
+  document.querySelector('select[data-field="startMonth"]').value = 'เม.ย.';
+  document.querySelector('select[data-field="endMonth"]').value   = 'พ.ค.';
+}
+
+/* =======================================================================
+   ชั้นจัดการฐานข้อมูล (localStorage)
+   ======================================================================= */
+const DB_KEY = 'wx_duty_reports';
+
+function dbAll(){
+  try{ return JSON.parse(localStorage.getItem(DB_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function dbSaveAll(obj){ localStorage.setItem(DB_KEY, JSON.stringify(obj)); }
+
+/* ---------- รวบรวมข้อมูลจากฟอร์มเป็นอ็อบเจกต์ ---------- */
+function collectData(){
+  const data = { fields:{}, status:{}, notes:{} };
+  document.querySelectorAll('[data-field]').forEach(el=>{
+    data.fields[el.dataset.field] = (el.type === 'checkbox') ? el.checked : el.value;
+  });
+  document.querySelectorAll('input[data-status]:checked').forEach(el=>{
+    data.status[el.dataset.status] = el.value;
+  });
+  document.querySelectorAll('input[data-note]').forEach(el=>{
+    if(el.value) data.notes[el.dataset.note] = el.value;
+  });
+  return data;
+}
+
+/* ---------- นำข้อมูลกลับเข้าฟอร์ม ---------- */
+function applyData(data){
+  clearForm(false);
+  if(!data) return;
+  for(const [k,v] of Object.entries(data.fields||{})){
+    const el = document.querySelector(`[data-field="${k}"]`);
+    if(!el) continue;
+    if(el.type === 'checkbox') el.checked = !!v; else el.value = v;
+  }
+  for(const [k,v] of Object.entries(data.status||{})){
+    const el = document.querySelector(`input[data-status="${k}"][value="${v}"]`);
+    if(el) el.checked = true;
+  }
+  for(const [k,v] of Object.entries(data.notes||{})){
+    const el = document.querySelector(`input[data-note="${k}"]`);
+    if(el) el.value = v;
+  }
+}
+
+/* ---------- ล้างฟอร์ม ---------- */
+function clearForm(resetDefaults=true){
+  document.querySelectorAll('[data-field]').forEach(el=>{
+    if(el.type === 'checkbox') el.checked = false;
+    else if(el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.querySelectorAll('input[data-status]').forEach(el=> el.checked = false);
+  document.querySelectorAll('input[data-note]').forEach(el=> el.value = '');
+  if(resetDefaults){
+    document.querySelector('[data-field="startYear"]').value = '๖๙';
+    document.querySelector('[data-field="endYear"]').value   = '๖๙';
+    document.querySelector('[data-field="startTime"]').value = '๐๘๐๐';
+    document.querySelector('[data-field="endTime"]').value   = '๐๘๐๐';
+    document.querySelector('select[data-field="startMonth"]').value = 'เม.ย.';
+    document.querySelector('select[data-field="endMonth"]').value   = 'พ.ค.';
+  }
+}
+
+/* ---------- ปรับ dropdown รายการที่บันทึกไว้ ---------- */
+function refreshRecordList(){
+  const sel = document.getElementById('recordSelect');
+  const all = dbAll();
+  const keys = Object.keys(all).sort().reverse();
+  sel.innerHTML = '<option value="">— เลือกรายงาน (' + keys.length + ' รายการ) —</option>' +
+    keys.map(k=>`<option value="${k}">${all[k].label || k}</option>`).join('');
+}
+
+/* ---------- สร้างชื่อ/ป้ายของรายการ ---------- */
+function makeLabel(data){
+  const f = data.fields || {};
+  const name = f.officerName || '(ไม่ระบุชื่อ)';
+  const d = `${f.startDay||'?'} ${f.startMonth||''} ${f.startYear||''}`.trim();
+  return `${d} — ${name}`;
+}
+
+/* =======================================================================
+   ผูกปุ่มควบคุม
+   ======================================================================= */
+function bindUI(){
+  document.getElementById('btnSave').addEventListener('click', ()=>{
+    const data = collectData();
+    const all = dbAll();
+    const id = 'rec_' + Date.now();
+    data.savedAt = new Date().toISOString();
+    data.label = makeLabel(data);
+    all[id] = data;
+    dbSaveAll(all);
+    refreshRecordList();
+    document.getElementById('recordSelect').value = id;
+    alert('บันทึกลงฐานข้อมูลเรียบร้อย\n' + data.label);
+  });
+
+  document.getElementById('btnLoad').addEventListener('click', ()=>{
+    const id = document.getElementById('recordSelect').value;
+    if(!id){ alert('กรุณาเลือกรายงานที่ต้องการดึงข้อมูลก่อน'); return; }
+    applyData(dbAll()[id]);
+  });
+
+  document.getElementById('btnDelete').addEventListener('click', ()=>{
+    const id = document.getElementById('recordSelect').value;
+    if(!id){ alert('กรุณาเลือกรายงานที่ต้องการลบก่อน'); return; }
+    if(!confirm('ยืนยันการลบรายงานนี้ออกจากฐานข้อมูล?')) return;
+    const all = dbAll(); delete all[id]; dbSaveAll(all);
+    refreshRecordList();
+  });
+
+  document.getElementById('btnNew').addEventListener('click', ()=>{
+    if(confirm('ล้างฟอร์มเพื่อกรอกรายงานใหม่?')){
+      clearForm(true);
+      document.getElementById('recordSelect').value = '';
+    }
+  });
+
+  document.getElementById('btnExport').addEventListener('click', ()=>{
+    const data = collectData();
+    data.label = makeLabel(data);
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'duty-report-' + (data.fields.startDay||'x') + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById('btnImport').addEventListener('click', ()=> document.getElementById('fileImport').click());
+  document.getElementById('fileImport').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try{ applyData(JSON.parse(ev.target.result)); }
+      catch(err){ alert('ไฟล์ JSON ไม่ถูกต้อง'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+}
+
+/* ---------- เริ่มต้น ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  buildChecklist();
+  buildMonths();
+  bindUI();
+  refreshRecordList();
+});
+</script>
+</body>
+</html>
