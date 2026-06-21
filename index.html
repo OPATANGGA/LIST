@@ -124,13 +124,26 @@
     padding:0 4px;
     min-width:40px;
     text-align:center;
+    vertical-align:baseline;
+    line-height:1.35;
+    height:1.5em;
   }
   .fill:focus{ outline:none; border-bottom-color:var(--accent); background:#eef5ff; }
   .fill.name{ min-width:230px; text-align:left; }
   .fill.w-date{ width:46px; }
   .fill.w-year{ width:40px; }
   .fill.w-time{ width:60px; }
-  select.fill{ text-align:left; }
+  /* dropdown เดือน: ตัดลูกศร native ให้เหมือนช่องเส้นใต้ และวางเส้นให้ตรงกัน */
+  select.fill{
+    text-align:left;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    background-image:none;
+    padding:0 4px;
+    width:58px;
+  }
+  select.fill::-ms-expand{ display:none; }
 
   /* ============ ตาราง Check-list ============ */
   table.cl{
@@ -233,6 +246,8 @@
     input::placeholder, textarea::placeholder{ color:transparent !important; opacity:0 !important; }
     /* checkbox ที่ไม่ได้ติ๊กให้พิมพ์เป็นช่องว่าง ไม่มีกรอบทึบ */
     td.col-st input[type="checkbox"]{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    /* ตัดลูกศร dropdown เดือนตอนพิมพ์ ให้เป็นเส้นเดียวกับช่องอื่น */
+    select.fill{ -webkit-appearance:none; -moz-appearance:none; appearance:none; background:transparent; }
     table.cl thead th{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     tr.grp td, table.cl thead th, .ack-box{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   }
