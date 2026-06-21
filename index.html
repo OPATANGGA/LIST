@@ -161,9 +161,10 @@
   /* รายการย่อย */
   td.item{ padding-left:6px; }
 
-  /* ติ๊กสถานภาพ */
-  td.col-st input[type="radio"]{
-    width:14px; height:14px; cursor:pointer; margin:0;
+  /* ติ๊กสถานภาพ — ใช้เครื่องหมายถูก (checkbox) แทนวงกลม */
+  td.col-st input[type="checkbox"]{
+    width:15px; height:15px; cursor:pointer; margin:0;
+    accent-color:var(--accent);
   }
   /* ช่องหมายเหตุในตาราง */
   td.col-note input{
@@ -190,17 +191,29 @@
   .sign-line .fill{ min-width:170px; }
   .sign-caption{ font-size:11.5px; color:var(--muted); text-align:center; }
 
-  /* กล่องหัวหน้าตรวจ/เซ็นเช็ค */
-  .chief-box{
-    margin-top:10px;
-    border:1px dashed #555;
-    border-radius:6px;
-    padding:6px 10px;
-    background:#fbfcfe;
+  /* กล่องรับทราบตามลำดับชั้น (หัวหน้า เซ็นเช็ค) */
+  .ack-area{
+    margin-top:16px;
+    display:flex;
+    justify-content:center;
+    gap:0;
   }
-  .chief-box .role{ font-weight:600; color:#922; font-size:12.5px; }
-  .chief-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:3px; }
-  .chk-inline{ display:inline-flex; align-items:center; gap:5px; }
+  .ack-box{
+    width:33.33%;
+    max-width:175px;
+    border:1px solid var(--line);
+    border-right:none;
+    padding:6px 8px 8px 8px;
+    text-align:center;
+    font-size:12px;
+  }
+  .ack-box:last-child{ border-right:1px solid var(--line); }
+  .ack-box .ack-head{ text-align:left; }
+  .ack-box .ack-sign{ text-align:left; margin:10px 0 2px 0; }
+  .ack-box .ack-sign .fill{ min-width:80px; }
+  .ack-box .ack-role{ font-size:11.5px; }
+  .ack-box .ack-date{ margin-top:14px; }
+  .ack-box .ack-date .fill{ min-width:120px; text-align:center; }
 
   /* ============ การพิมพ์ ============ */
   @media print{
@@ -250,9 +263,6 @@
 <!-- แผ่นกระดาษ A4 -->
 <!-- ========================================================= -->
 <div class="a4-page" id="page">
-
-  <div class="doc-title">สมุดรายงานผลการปฏิบัติหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ ฯ</div>
-  <div class="doc-sub">กองข่าวอากาศ คปอ. (กขอ.คปอ.)</div>
 
   <!-- ===== ส่วนหัวฟอร์ม / ส่วนเจ้าหน้าที่ผู้ปฏิบัติงาน ===== -->
   <p class="lead"><strong>เรียน</strong> น.สารสนเทศข้อมูลข่าวอากาศ ฯ</p>
@@ -310,22 +320,25 @@
     </div>
   </div>
 
-  <!-- ===== ส่วนหัวหน้า ตรวจสอบ / เซ็นเช็ค ===== -->
-  <div class="chief-box">
-    <span class="role">สำหรับหัวหน้า / น.สารสนเทศ ฯ ตรวจสอบและลงนาม</span>
-    <div class="chief-row">
-      <label class="chk-inline">
-        <input type="checkbox" data-field="chiefChecked"> ตรวจสอบรายงานแล้ว
-      </label>
-      <span>ความเห็น:
-        <input class="fill" data-field="chiefRemark" style="min-width:300px" placeholder="ความเห็น / ข้อสั่งการ">
-      </span>
-      <span>ลงชื่อ
-        <input class="fill" data-field="chiefSign" style="min-width:170px" placeholder="หัวหน้า ผู้ตรวจ">
-      </span>
-      <span>วันที่
-        <input class="fill" data-field="chiefDate" style="min-width:90px" placeholder="วัน/เดือน/ปี">
-      </span>
+  <!-- ===== ส่วนหัวหน้า ตามลำดับชั้น รับทราบ / เซ็นเช็ค ===== -->
+  <div class="ack-area">
+    <div class="ack-box">
+      <div class="ack-head">ทราบแล้ว</div>
+      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack1Sign"></div>
+      <div class="ack-role">น.สารสนเทศ.ผสท.กขอ.คปอ.</div>
+      <div class="ack-date"><input class="fill" data-field="ack1Date" value="........./เม.ย./๖๙"></div>
+    </div>
+    <div class="ack-box">
+      <div class="ack-head">ทราบแล้ว</div>
+      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack2Sign"></div>
+      <div class="ack-role">หน.ผสท.กขอ.คปอ.</div>
+      <div class="ack-date"><input class="fill" data-field="ack2Date" value="........./เม.ย./๖๙"></div>
+    </div>
+    <div class="ack-box">
+      <div class="ack-head">ทราบแล้ว</div>
+      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack3Sign"></div>
+      <div class="ack-role">ผอ.กขอ.คปอ.</div>
+      <div class="ack-date"><input class="fill" data-field="ack3Date" value="........./เม.ย./๖๙"></div>
     </div>
   </div>
 
@@ -390,13 +403,23 @@ function buildChecklist(){
       html += `<tr>
         <td class="col-no">${row.no}</td>
         <td class="item">${row.text}</td>
-        <td class="col-st"><input type="radio" name="st_${row.id}" data-status="${row.id}" value="ok"></td>
-        <td class="col-st"><input type="radio" name="st_${row.id}" data-status="${row.id}" value="ng"></td>
+        <td class="col-st"><input type="checkbox" data-status="${row.id}" value="ok"></td>
+        <td class="col-st"><input type="checkbox" data-status="${row.id}" value="ng"></td>
         <td class="col-note"><input type="text" data-note="${row.id}"></td>
       </tr>`;
     }
   }
   body.innerHTML = html;
+
+  // ติ๊กได้เพียงสถานภาพเดียวต่อแถว (ใช้ได้ / ใช้ไม่ได้)
+  body.addEventListener('change', e=>{
+    const t = e.target;
+    if(t.matches('input[type="checkbox"][data-status]') && t.checked){
+      body.querySelectorAll(`input[data-status="${t.dataset.status}"]`).forEach(cb=>{
+        if(cb !== t) cb.checked = false;
+      });
+    }
+  });
 }
 
 /* ---------- เติม dropdown เดือน ---------- */
@@ -471,6 +494,9 @@ function clearForm(resetDefaults=true){
     document.querySelector('[data-field="endTime"]').value   = '๐๘๐๐';
     document.querySelector('select[data-field="startMonth"]').value = 'เม.ย.';
     document.querySelector('select[data-field="endMonth"]').value   = 'พ.ค.';
+    ['ack1Date','ack2Date','ack3Date'].forEach(f=>{
+      document.querySelector(`[data-field="${f}"]`).value = '........./เม.ย./๖๙';
+    });
   }
 }
 
