@@ -640,6 +640,16 @@ function currentThaiMonth(){ return THAI_MONTHS[new Date().getMonth()]; }
 /* แปลงเลขอารบิกเป็นเลขไทย */
 const THAI_DIGITS = '๐๑๒๓๔๕๖๗๘๙';
 function toThaiNum(n){ return String(n).replace(/\d/g, d=>THAI_DIGITS[+d]); }
+/* แปลงข้อความ (เลขไทย/อารบิก) เป็นตัวเลขจำนวนเต็ม เช่น '๐๘' → 8 */
+function thaiToNum(s){
+  if(s === undefined || s === null) return 0;
+  let out = '';
+  for(const ch of String(s)){
+    if(ch >= '0' && ch <= '9') out += ch;
+    else { const i = THAI_DIGITS.indexOf(ch); if(i >= 0) out += i; }
+  }
+  return parseInt(out, 10) || 0;
+}
 
 
 /* ---------- สร้างตาราง Check-list ---------- */
@@ -996,14 +1006,30 @@ function bindUI(){
   });
 }
 
+/* สร้างดัชนีรายงานที่บันทึกไว้ ตามคีย์ "เดือน|วัน" (เก็บฉบับล่าสุด) */
+function buildDayIndex(){
+  const idx = {}, when = {};
+  for(const rec of Object.values(dbAll())){
+    const f = rec.fields || {};
+    const dnum = thaiToNum(f.startDay);
+    if(!f.startMonth || !dnum) continue;
+    const key = f.startMonth + '|' + dnum;
+    const t = rec.savedAt || '';
+    if(when[key] === undefined || t >= when[key]){ idx[key] = rec; when[key] = t; }
+  }
+  return idx;
+}
+
 /* ---------- สร้างและพิมพ์เอกสารหลายหน้า ---------- */
 function printMulti(){
   const mode = document.getElementById('multiMode').value;
-  const base = collectData();                       // ใช้ข้อมูลจากฟอร์มปัจจุบันเป็นต้นแบบทุกแผ่น
+  const base = collectData();                       // ข้อมูลจากฟอร์มปัจจุบัน (ใช้เมื่อไม่มีรายงานบันทึกไว้)
   const monthSel = document.querySelector('select[data-field="startMonth"]').value;
 
-  // สร้างรายการวันที่/จำนวนแผ่นตามโหมด
-  const overrides = [];
+  // แต่ละหน้า = อ็อบเจกต์ข้อมูลที่จะเติมลงฟอร์ม
+  const pages = [];
+  let savedCount = 0;
+
   if(mode === 'month' || mode === 'range'){
     if(!monthSel){ alert('กรุณาเลือกเดือนในช่อง "เมื่อวันที่" ก่อนพิมพ์หลายหน้า'); return; }
     const mi   = THAI_MONTHS.indexOf(monthSel);
@@ -1015,28 +1041,43 @@ function printMulti(){
       to   = Math.min(dim, parseInt(document.getElementById('rangeTo').value,10) || dim);
       if(to < from){ alert('ช่วงวันที่ไม่ถูกต้อง (ถึง ต้องไม่น้อยกว่า จาก)'); return; }
     }
+    const idx = buildDayIndex();
     for(let d = from; d <= to; d++){
-      overrides.push({ day: toThaiNum(d), month: monthSel });
+      const rec = idx[monthSel + '|' + d];
+      if(rec){                                   // มีรายงานที่บันทึกไว้ของวันนี้ → ใช้ข้อมูลจริง
+        pages.push(JSON.parse(JSON.stringify(rec)));
+        savedCount++;
+      } else {                                   // ไม่มี → ใช้ฟอร์มปัจจุบันแล้วเติมวันที่ให้
+        const data = JSON.parse(JSON.stringify(base));
+        data.fields.startDay = toThaiNum(d);
+        data.fields.startMonth = monthSel;
+        pages.push(data);
+      }
     }
   } else { // copies
     let n = parseInt(document.getElementById('copiesCount').value,10) || 1;
     n = Math.min(Math.max(n,1), 366);
-    for(let i = 0; i < n; i++) overrides.push(null);
+    for(let i = 0; i < n; i++) pages.push(JSON.parse(JSON.stringify(base)));
   }
 
-  if(overrides.length > 120 &&
-     !confirm(`กำลังจะพิมพ์ ${overrides.length} แผ่น ต้องการดำเนินการต่อหรือไม่?`)) return;
+  if(pages.length > 120 &&
+     !confirm(`กำลังจะพิมพ์ ${pages.length} แผ่น ต้องการดำเนินการต่อหรือไม่?`)) return;
+
+  if((mode === 'month' || mode === 'range')){
+    const msg = savedCount > 0
+      ? `ดึงรายงานที่บันทึกไว้ ${savedCount} วัน (จากทั้งหมด ${pages.length} แผ่น) ส่วนวันที่ไม่มีข้อมูลจะใช้ฟอร์มปัจจุบัน`
+      : `ไม่พบรายงานที่บันทึกไว้สำหรับเดือน "${monthSel}" — จะพิมพ์เป็นฟอร์มเปล่าพร้อมวันที่ ${pages.length} แผ่น`;
+    if(!confirm(msg + '\n\nดำเนินการพิมพ์ต่อหรือไม่?')) return;
+  }
 
   // สร้างแต่ละแผ่นจากการโคลนฟอร์มต้นฉบับ แล้วเติมข้อมูล
   const master = document.getElementById('page');
   const container = document.getElementById('multiPrint');
   container.innerHTML = '';
-  for(const ov of overrides){
+  for(const data of pages){
     const clone = master.cloneNode(true);
     clone.removeAttribute('id');
     container.appendChild(clone);
-    const data = JSON.parse(JSON.stringify(base));
-    if(ov){ data.fields.startDay = ov.day; data.fields.startMonth = ov.month; }
     applyData(data, clone);
   }
 
