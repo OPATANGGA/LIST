@@ -245,6 +245,31 @@
   .ack-box .ack-date{ margin-top:14px; }
   .ack-box .ack-date .fill{ min-width:120px; text-align:center; }
 
+  /* ============ ลายเซ็น (รูปภาพ) ============ */
+  .sign-wrap{ position:relative; display:inline-block; }
+  .sign-img{
+    display:none;
+    position:absolute;
+    left:50%;
+    bottom:calc(100% - 6px);   /* วางเหนือเส้นลงชื่อเล็กน้อย */
+    transform:translateX(-50%);
+    max-height:26px;
+    max-width:130px;
+    pointer-events:none;
+  }
+  .sign-img.show{ display:block; }
+  /* ตัวเลือกลายเซ็นในฟอร์ม (ไม่พิมพ์) */
+  select.sign-picker{
+    font-family:inherit;
+    font-size:10.5px;
+    color:#0d3b66;
+    border:1px solid #bcd;
+    border-radius:4px;
+    background:#f2f7ff;
+    max-width:120px;
+    vertical-align:middle;
+  }
+
   /* ภาชนะพิมพ์หลายหน้า — ซ่อนบนจอเสมอ */
   #multiPrint{ display:none; }
 
@@ -319,6 +344,18 @@
     <button id="btnPrintMulti" type="button">🖨 พิมพ์หลายหน้า</button>
   </div>
 
+  <!-- ===== คลังรายชื่อ / ลายเซ็น เจ้าหน้าที่ ===== -->
+  <div class="multi-row">
+    <strong>👤 รายชื่อเจ้าหน้าที่:</strong>
+    <input id="officerNameInput" type="text" placeholder="ยศ ชื่อ-สกุล" style="min-width:200px">
+    <button id="btnAddOfficer" type="button">＋ เพิ่มรายชื่อ</button>
+    <select id="officerSelect" style="min-width:220px"></select>
+    <button id="btnUploadSign" type="button">🖊 อัพโหลดลายเซ็น</button>
+    <button id="btnDeleteSign" type="button" class="ghost">ลบลายเซ็น</button>
+    <button id="btnDeleteOfficer" type="button" class="danger">🗑 ลบรายชื่อ</button>
+    <input type="file" id="signFile" accept="image/*" style="display:none">
+  </div>
+
   <div class="hint">บันทึกข้อมูลในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล สามารถบันทึก ดึงกลับมาแก้ไข และส่งออกเป็นไฟล์ JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้ · โหมด "พิมพ์หลายหน้า" จะทำสำเนาฟอร์มปัจจุบันหลายแผ่น (โหมดทั้งเดือน/ช่วงวันที่จะเติมวันที่ในช่อง "เมื่อวันที่" ให้อัตโนมัติตามเดือนที่เลือก)</div>
 </div>
 
@@ -332,6 +369,7 @@
 
   <p class="lead indent">
     กระผม <input class="fill name" data-field="officerName" placeholder="ยศ–ชื่อ–สกุล">
+    <select class="sign-picker no-print" data-target="officerName"></select>
     ได้รับมอบหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ
   </p>
   <p class="lead">
@@ -376,8 +414,20 @@
   <div class="sign-area">
     <div class="sign-box"></div>
     <div class="sign-box">
-      <div class="sign-line">ลงชื่อ <input class="fill" data-field="signSender" placeholder="ผู้ส่ง"> ผู้ส่ง</div>
-      <div class="sign-line">ลงชื่อ <input class="fill" data-field="signReceiver" placeholder="ผู้รับ"> ผู้รับ</div>
+      <div class="sign-line">ลงชื่อ
+        <span class="sign-wrap">
+          <img class="sign-img" data-signimg="signSender" alt="">
+          <input class="fill sign-name" data-field="signSender" placeholder="ผู้ส่ง">
+        </span> ผู้ส่ง
+        <select class="sign-picker no-print" data-target="signSender"></select>
+      </div>
+      <div class="sign-line">ลงชื่อ
+        <span class="sign-wrap">
+          <img class="sign-img" data-signimg="signReceiver" alt="">
+          <input class="fill sign-name" data-field="signReceiver" placeholder="ผู้รับ">
+        </span> ผู้รับ
+        <select class="sign-picker no-print" data-target="signReceiver"></select>
+      </div>
     </div>
   </div>
 
@@ -385,19 +435,37 @@
   <div class="ack-area">
     <div class="ack-box">
       <div class="ack-head">ทราบแล้ว</div>
-      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack1Sign"></div>
+      <div class="ack-sign">ลงชื่อ
+        <span class="sign-wrap">
+          <img class="sign-img" data-signimg="ack1Sign" alt="">
+          <input class="fill sign-name" data-field="ack1Sign">
+        </span>
+        <select class="sign-picker no-print" data-target="ack1Sign"></select>
+      </div>
       <div class="ack-role">น.สารสนเทศ.ผสท.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack1Date" value="........./เม.ย./๖๙"></div>
     </div>
     <div class="ack-box">
       <div class="ack-head">ทราบแล้ว</div>
-      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack2Sign"></div>
+      <div class="ack-sign">ลงชื่อ
+        <span class="sign-wrap">
+          <img class="sign-img" data-signimg="ack2Sign" alt="">
+          <input class="fill sign-name" data-field="ack2Sign">
+        </span>
+        <select class="sign-picker no-print" data-target="ack2Sign"></select>
+      </div>
       <div class="ack-role">หน.ผสท.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack2Date" value="........./เม.ย./๖๙"></div>
     </div>
     <div class="ack-box">
       <div class="ack-head">ทราบแล้ว</div>
-      <div class="ack-sign">ลงชื่อ <input class="fill" data-field="ack3Sign"></div>
+      <div class="ack-sign">ลงชื่อ
+        <span class="sign-wrap">
+          <img class="sign-img" data-signimg="ack3Sign" alt="">
+          <input class="fill sign-name" data-field="ack3Sign">
+        </span>
+        <select class="sign-picker no-print" data-target="ack3Sign"></select>
+      </div>
       <div class="ack-role">ผอ.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack3Date" value="........./เม.ย./๖๙"></div>
     </div>
@@ -520,9 +588,77 @@ function dbAll(){
 }
 function dbSaveAll(obj){ localStorage.setItem(DB_KEY, JSON.stringify(obj)); }
 
+/* =======================================================================
+   คลังรายชื่อ / ลายเซ็น เจ้าหน้าที่ (localStorage)
+   โครงสร้าง: [ { id, name, sign(dataURL|null) }, ... ]
+   ======================================================================= */
+const OFF_KEY = 'wx_officers';
+function offAll(){
+  try{ return JSON.parse(localStorage.getItem(OFF_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function offSaveAll(list){ localStorage.setItem(OFF_KEY, JSON.stringify(list)); }
+function offFind(id){ return offAll().find(o=>o.id === id) || null; }
+
+function addOfficer(name){
+  name = (name||'').trim();
+  if(!name){ alert('กรุณากรอกชื่อเจ้าหน้าที่ก่อน'); return; }
+  const list = offAll();
+  if(list.some(o=>o.name === name)){ alert('มีรายชื่อนี้อยู่แล้ว'); return; }
+  list.push({ id:'off_'+Date.now(), name, sign:null });
+  offSaveAll(list);
+  refreshOfficers(list[list.length-1].id);
+}
+function deleteOfficer(id){
+  offSaveAll(offAll().filter(o=>o.id !== id));
+  refreshOfficers();
+}
+function setOfficerSign(id, dataURL){
+  const list = offAll();
+  const o = list.find(x=>x.id === id);
+  if(o){ o.sign = dataURL; offSaveAll(list); refreshOfficers(id); }
+}
+
+/* เติมรายชื่อลงใน dropdown ทั้งหมด (ตัวจัดการ + ตัวเลือกลายเซ็นในฟอร์ม) */
+function refreshOfficers(keepId){
+  const list = offAll();
+
+  // dropdown ตัวจัดการ
+  const mgr = document.getElementById('officerSelect');
+  const cur = keepId || mgr.value;
+  mgr.innerHTML = '<option value="">— เลือกเจ้าหน้าที่ ('+list.length+') —</option>' +
+    list.map(o=>`<option value="${o.id}">${o.sign ? '🖊 ' : ''}${o.name}</option>`).join('');
+  if(cur && list.some(o=>o.id===cur)) mgr.value = cur;
+
+  // ตัวเลือกลายเซ็นในฟอร์ม (ทุกช่อง)
+  document.querySelectorAll('select.sign-picker').forEach(sel=>{
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— เลือกชื่อ/ลายเซ็น —</option>' +
+      list.map(o=>`<option value="${o.id}">${o.sign ? '🖊 ' : ''}${o.name}</option>`).join('') +
+      '<option value="__clear__">— ล้างช่องนี้ —</option>';
+    if(prev && list.some(o=>o.id===prev)) sel.value = prev;
+  });
+}
+
+/* วางชื่อ + ลายเซ็นของเจ้าหน้าที่ลงในช่องเป้าหมาย (target = data-field) */
+function stampSignature(target, officer, root=document){
+  const input = root.querySelector(`[data-field="${target}"]`);
+  const img   = root.querySelector(`img[data-signimg="${target}"]`);
+  if(!officer){                       // ล้างช่อง
+    if(input) input.value = '';
+    if(img){ img.removeAttribute('src'); img.classList.remove('show'); }
+    return;
+  }
+  if(input) input.value = officer.name;
+  if(img){
+    if(officer.sign){ img.src = officer.sign; img.classList.add('show'); }
+    else { img.removeAttribute('src'); img.classList.remove('show'); }
+  }
+}
+
 /* ---------- รวบรวมข้อมูลจากฟอร์มเป็นอ็อบเจกต์ (root = ขอบเขตที่อ่าน) ---------- */
 function collectData(root=document){
-  const data = { fields:{}, status:{}, notes:{} };
+  const data = { fields:{}, status:{}, notes:{}, signatures:{} };
   root.querySelectorAll('[data-field]').forEach(el=>{
     data.fields[el.dataset.field] = (el.type === 'checkbox') ? el.checked : el.value;
   });
@@ -531,6 +667,9 @@ function collectData(root=document){
   });
   root.querySelectorAll('input[data-note]').forEach(el=>{
     if(el.value) data.notes[el.dataset.note] = el.value;
+  });
+  root.querySelectorAll('img[data-signimg]').forEach(img=>{
+    if(img.getAttribute('src')) data.signatures[img.dataset.signimg] = img.getAttribute('src');
   });
   return data;
 }
@@ -552,6 +691,10 @@ function applyData(data, root=document){
     const el = root.querySelector(`input[data-note="${k}"]`);
     if(el) el.value = v;
   }
+  for(const [k,v] of Object.entries(data.signatures||{})){
+    const img = root.querySelector(`img[data-signimg="${k}"]`);
+    if(img){ img.src = v; img.classList.add('show'); }
+  }
 }
 
 /* ---------- ล้างฟอร์ม ---------- */
@@ -563,6 +706,7 @@ function clearForm(resetDefaults=true, root=document){
   });
   root.querySelectorAll('input[data-status]').forEach(el=> el.checked = false);
   root.querySelectorAll('input[data-note]').forEach(el=> el.value = '');
+  root.querySelectorAll('img[data-signimg]').forEach(img=>{ img.removeAttribute('src'); img.classList.remove('show'); });
   if(resetDefaults){
     root.querySelector('[data-field="startYear"]').value = '๖๙';
     root.querySelector('[data-field="endYear"]').value   = '๖๙';
@@ -669,6 +813,54 @@ function bindUI(){
     document.body.classList.remove('printing-multi');
     document.getElementById('multiPrint').innerHTML = '';
   });
+
+  // ----- คลังรายชื่อ / ลายเซ็น เจ้าหน้าที่ -----
+  document.getElementById('btnAddOfficer').addEventListener('click', ()=>{
+    const inp = document.getElementById('officerNameInput');
+    addOfficer(inp.value);
+    inp.value = '';
+  });
+  document.getElementById('officerNameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('btnAddOfficer').click(); }
+  });
+
+  document.getElementById('btnDeleteOfficer').addEventListener('click', ()=>{
+    const id = document.getElementById('officerSelect').value;
+    if(!id){ alert('กรุณาเลือกรายชื่อที่ต้องการลบก่อน'); return; }
+    if(confirm('ยืนยันการลบรายชื่อนี้ (รวมลายเซ็น) ออกจากคลัง?')) deleteOfficer(id);
+  });
+
+  document.getElementById('btnUploadSign').addEventListener('click', ()=>{
+    if(!document.getElementById('officerSelect').value){
+      alert('กรุณาเลือกเจ้าหน้าที่ที่ต้องการอัพโหลดลายเซ็นก่อน'); return;
+    }
+    document.getElementById('signFile').click();
+  });
+  document.getElementById('signFile').addEventListener('change', e=>{
+    const id = document.getElementById('officerSelect').value;
+    const file = e.target.files[0];
+    if(!file || !id) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{ setOfficerSign(id, ev.target.result); alert('บันทึกลายเซ็นเรียบร้อย'); };
+    reader.readAsDataURL(file);   // เก็บเป็น dataURL ในฐานข้อมูล
+    e.target.value = '';
+  });
+
+  document.getElementById('btnDeleteSign').addEventListener('click', ()=>{
+    const id = document.getElementById('officerSelect').value;
+    if(!id){ alert('กรุณาเลือกเจ้าหน้าที่ก่อน'); return; }
+    if(confirm('ลบเฉพาะลายเซ็นของเจ้าหน้าที่คนนี้?')) setOfficerSign(id, null);
+  });
+
+  // ตัวเลือกลายเซ็นในฟอร์ม — เลือกแล้ววางชื่อ+ลายเซ็นลงช่อง
+  document.querySelectorAll('select.sign-picker').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const target = sel.dataset.target;
+      if(sel.value === '__clear__'){ stampSignature(target, null); }
+      else if(sel.value){ stampSignature(target, offFind(sel.value)); }
+      sel.value = '';   // รีเซ็ตกลับเป็นหัวข้อ
+    });
+  });
 }
 
 /* ---------- สร้างและพิมพ์เอกสารหลายหน้า ---------- */
@@ -725,6 +917,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   buildMonths();
   bindUI();
   refreshRecordList();
+  refreshOfficers();
 });
 </script>
 </body>
