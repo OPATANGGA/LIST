@@ -96,6 +96,19 @@
   .toolbar .spacer{ flex:1; }
   .toolbar .hint{ font-size:11.5px; color:#9fb0c0; flex:0 0 100%; }
 
+  /* แถวพิมพ์หลายหน้า */
+  .multi-row{
+    flex:0 0 100%;
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    border-top:1px solid #3a4754; margin-top:6px; padding-top:10px;
+    font-size:13px;
+  }
+  .multi-row select{ min-width:auto; }
+  .multi-row input[type="number"]{
+    font-family:inherit; font-size:13px; padding:5px 8px;
+    border-radius:6px; border:1px solid #3a4754; background:#fff; color:#000;
+  }
+
   /* ============ หัวเอกสาร ============ */
   .doc-title{
     text-align:center;
@@ -232,8 +245,16 @@
   .ack-box .ack-date{ margin-top:14px; }
   .ack-box .ack-date .fill{ min-width:120px; text-align:center; }
 
+  /* ภาชนะพิมพ์หลายหน้า — ซ่อนบนจอเสมอ */
+  #multiPrint{ display:none; }
+
   /* ============ การพิมพ์ ============ */
   @media print{
+    /* โหมดพิมพ์หลายหน้า: ซ่อนฟอร์มต้นฉบับ แสดงชุดสำเนาแทน */
+    body.printing-multi #page{ display:none !important; }
+    body.printing-multi #multiPrint{ display:block !important; }
+    body.printing-multi #multiPrint .a4-page{ page-break-after:always; }
+    body.printing-multi #multiPrint .a4-page:last-child{ page-break-after:auto; }
     body{ background:#fff; padding:0; }
     .no-print{ display:none !important; }
     .a4-page{
@@ -280,7 +301,25 @@
   <button id="btnPrint" type="button">🖨 พิมพ์ / บันทึก PDF</button>
   <input type="file" id="fileImport" accept="application/json" style="display:none">
 
-  <div class="hint">บันทึกข้อมูลในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล สามารถบันทึก ดึงกลับมาแก้ไข และส่งออกเป็นไฟล์ JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้</div>
+  <!-- ===== พิมพ์หลายหน้า ===== -->
+  <div class="multi-row">
+    <strong>🗓 พิมพ์หลายหน้า:</strong>
+    <select id="multiMode">
+      <option value="month">ทั้งเดือน (วันละ ๑ แผ่น)</option>
+      <option value="range">ช่วงวันที่ (จาก–ถึง)</option>
+      <option value="copies">จำนวนสำเนา (เหมือนกันทุกแผ่น)</option>
+    </select>
+    <span id="wrapRange" style="display:none;">
+      ตั้งแต่วันที่ <input id="rangeFrom" type="number" min="1" max="31" value="1" style="width:60px">
+      ถึง <input id="rangeTo" type="number" min="1" max="31" value="15" style="width:60px">
+    </span>
+    <span id="wrapCopies" style="display:none;">
+      จำนวน <input id="copiesCount" type="number" min="1" max="366" value="30" style="width:70px"> แผ่น
+    </span>
+    <button id="btnPrintMulti" type="button">🖨 พิมพ์หลายหน้า</button>
+  </div>
+
+  <div class="hint">บันทึกข้อมูลในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล สามารถบันทึก ดึงกลับมาแก้ไข และส่งออกเป็นไฟล์ JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้ · โหมด "พิมพ์หลายหน้า" จะทำสำเนาฟอร์มปัจจุบันหลายแผ่น (โหมดทั้งเดือน/ช่วงวันที่จะเติมวันที่ในช่อง "เมื่อวันที่" ให้อัตโนมัติตามเดือนที่เลือก)</div>
 </div>
 
 <!-- ========================================================= -->
@@ -366,6 +405,9 @@
 
 </div><!-- /.a4-page -->
 
+<!-- ภาชนะสำหรับพิมพ์หลายหน้า (ซ่อนบนจอ แสดงเฉพาะตอนพิมพ์หลายหน้า) -->
+<div id="multiPrint"></div>
+
 <script>
 /* =======================================================================
    ข้อมูลรายการ Check-list  (type: grp = หัวข้อหลักไม่มีสถานภาพ, item = มีสถานภาพ)
@@ -404,6 +446,10 @@ const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.
 
 /* เดือนปัจจุบัน (แบบย่อภาษาไทย) */
 function currentThaiMonth(){ return THAI_MONTHS[new Date().getMonth()]; }
+
+/* แปลงเลขอารบิกเป็นเลขไทย */
+const THAI_DIGITS = '๐๑๒๓๔๕๖๗๘๙';
+function toThaiNum(n){ return String(n).replace(/\d/g, d=>THAI_DIGITS[+d]); }
 
 
 /* ---------- สร้างตาราง Check-list ---------- */
@@ -474,59 +520,59 @@ function dbAll(){
 }
 function dbSaveAll(obj){ localStorage.setItem(DB_KEY, JSON.stringify(obj)); }
 
-/* ---------- รวบรวมข้อมูลจากฟอร์มเป็นอ็อบเจกต์ ---------- */
-function collectData(){
+/* ---------- รวบรวมข้อมูลจากฟอร์มเป็นอ็อบเจกต์ (root = ขอบเขตที่อ่าน) ---------- */
+function collectData(root=document){
   const data = { fields:{}, status:{}, notes:{} };
-  document.querySelectorAll('[data-field]').forEach(el=>{
+  root.querySelectorAll('[data-field]').forEach(el=>{
     data.fields[el.dataset.field] = (el.type === 'checkbox') ? el.checked : el.value;
   });
-  document.querySelectorAll('input[data-status]:checked').forEach(el=>{
+  root.querySelectorAll('input[data-status]:checked').forEach(el=>{
     data.status[el.dataset.status] = el.value;
   });
-  document.querySelectorAll('input[data-note]').forEach(el=>{
+  root.querySelectorAll('input[data-note]').forEach(el=>{
     if(el.value) data.notes[el.dataset.note] = el.value;
   });
   return data;
 }
 
-/* ---------- นำข้อมูลกลับเข้าฟอร์ม ---------- */
-function applyData(data){
-  clearForm(false);
+/* ---------- นำข้อมูลกลับเข้าฟอร์ม (root = ขอบเขตที่เขียน) ---------- */
+function applyData(data, root=document){
+  clearForm(false, root);
   if(!data) return;
   for(const [k,v] of Object.entries(data.fields||{})){
-    const el = document.querySelector(`[data-field="${k}"]`);
+    const el = root.querySelector(`[data-field="${k}"]`);
     if(!el) continue;
     if(el.type === 'checkbox') el.checked = !!v; else el.value = v;
   }
   for(const [k,v] of Object.entries(data.status||{})){
-    const el = document.querySelector(`input[data-status="${k}"][value="${v}"]`);
+    const el = root.querySelector(`input[data-status="${k}"][value="${v}"]`);
     if(el) el.checked = true;
   }
   for(const [k,v] of Object.entries(data.notes||{})){
-    const el = document.querySelector(`input[data-note="${k}"]`);
+    const el = root.querySelector(`input[data-note="${k}"]`);
     if(el) el.value = v;
   }
 }
 
 /* ---------- ล้างฟอร์ม ---------- */
-function clearForm(resetDefaults=true){
-  document.querySelectorAll('[data-field]').forEach(el=>{
+function clearForm(resetDefaults=true, root=document){
+  root.querySelectorAll('[data-field]').forEach(el=>{
     if(el.type === 'checkbox') el.checked = false;
     else if(el.tagName === 'SELECT') el.selectedIndex = 0;
     else el.value = '';
   });
-  document.querySelectorAll('input[data-status]').forEach(el=> el.checked = false);
-  document.querySelectorAll('input[data-note]').forEach(el=> el.value = '');
+  root.querySelectorAll('input[data-status]').forEach(el=> el.checked = false);
+  root.querySelectorAll('input[data-note]').forEach(el=> el.value = '');
   if(resetDefaults){
-    document.querySelector('[data-field="startYear"]').value = '๖๙';
-    document.querySelector('[data-field="endYear"]').value   = '๖๙';
-    document.querySelector('[data-field="startTime"]').value = '๐๘๐๐';
-    document.querySelector('[data-field="endTime"]').value   = '๐๘๐๐';
+    root.querySelector('[data-field="startYear"]').value = '๖๙';
+    root.querySelector('[data-field="endYear"]').value   = '๖๙';
+    root.querySelector('[data-field="startTime"]').value = '๐๘๐๐';
+    root.querySelector('[data-field="endTime"]').value   = '๐๘๐๐';
     const cm = currentThaiMonth();
-    document.querySelector('select[data-field="startMonth"]').value = cm;
-    document.querySelector('select[data-field="endMonth"]').value   = cm;
+    root.querySelector('select[data-field="startMonth"]').value = cm;
+    root.querySelector('select[data-field="endMonth"]').value   = cm;
     ['ack1Date','ack2Date','ack3Date'].forEach(f=>{
-      document.querySelector(`[data-field="${f}"]`).value = `........./${cm}/๖๙`;
+      root.querySelector(`[data-field="${f}"]`).value = `........./${cm}/๖๙`;
     });
   }
 }
@@ -611,6 +657,66 @@ function bindUI(){
   });
 
   document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+
+  // ----- พิมพ์หลายหน้า -----
+  const multiMode = document.getElementById('multiMode');
+  multiMode.addEventListener('change', ()=>{
+    document.getElementById('wrapRange').style.display  = (multiMode.value === 'range')  ? '' : 'none';
+    document.getElementById('wrapCopies').style.display = (multiMode.value === 'copies') ? '' : 'none';
+  });
+  document.getElementById('btnPrintMulti').addEventListener('click', printMulti);
+  window.addEventListener('afterprint', ()=>{
+    document.body.classList.remove('printing-multi');
+    document.getElementById('multiPrint').innerHTML = '';
+  });
+}
+
+/* ---------- สร้างและพิมพ์เอกสารหลายหน้า ---------- */
+function printMulti(){
+  const mode = document.getElementById('multiMode').value;
+  const base = collectData();                       // ใช้ข้อมูลจากฟอร์มปัจจุบันเป็นต้นแบบทุกแผ่น
+  const monthSel = document.querySelector('select[data-field="startMonth"]').value;
+
+  // สร้างรายการวันที่/จำนวนแผ่นตามโหมด
+  const overrides = [];
+  if(mode === 'month' || mode === 'range'){
+    if(!monthSel){ alert('กรุณาเลือกเดือนในช่อง "เมื่อวันที่" ก่อนพิมพ์หลายหน้า'); return; }
+    const mi   = THAI_MONTHS.indexOf(monthSel);
+    const year = new Date().getFullYear();
+    const dim  = new Date(year, mi + 1, 0).getDate();   // จำนวนวันในเดือน
+    let from = 1, to = dim;
+    if(mode === 'range'){
+      from = Math.max(1, parseInt(document.getElementById('rangeFrom').value,10) || 1);
+      to   = Math.min(dim, parseInt(document.getElementById('rangeTo').value,10) || dim);
+      if(to < from){ alert('ช่วงวันที่ไม่ถูกต้อง (ถึง ต้องไม่น้อยกว่า จาก)'); return; }
+    }
+    for(let d = from; d <= to; d++){
+      overrides.push({ day: toThaiNum(d), month: monthSel });
+    }
+  } else { // copies
+    let n = parseInt(document.getElementById('copiesCount').value,10) || 1;
+    n = Math.min(Math.max(n,1), 366);
+    for(let i = 0; i < n; i++) overrides.push(null);
+  }
+
+  if(overrides.length > 120 &&
+     !confirm(`กำลังจะพิมพ์ ${overrides.length} แผ่น ต้องการดำเนินการต่อหรือไม่?`)) return;
+
+  // สร้างแต่ละแผ่นจากการโคลนฟอร์มต้นฉบับ แล้วเติมข้อมูล
+  const master = document.getElementById('page');
+  const container = document.getElementById('multiPrint');
+  container.innerHTML = '';
+  for(const ov of overrides){
+    const clone = master.cloneNode(true);
+    clone.removeAttribute('id');
+    container.appendChild(clone);
+    const data = JSON.parse(JSON.stringify(base));
+    if(ov){ data.fields.startDay = ov.day; data.fields.startMonth = ov.month; }
+    applyData(data, clone);
+  }
+
+  document.body.classList.add('printing-multi');
+  window.print();
 }
 
 /* ---------- เริ่มต้น ---------- */
