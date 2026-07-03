@@ -294,10 +294,12 @@
   }
   .ack-box:last-child{ border-right:1px solid var(--line); }
   .ack-box .ack-head{ text-align:left; }
-  .ack-box .ack-sign{ text-align:left; margin:10px 0 2px 0; white-space:nowrap; }
-  .ack-box .ack-sign .fill{ min-width:0; width:135px; }   /* เส้นลงชื่อยาวพอสำหรับชื่อ-สกุล */
+  /* เส้นลงชื่อยืดเต็มความกว้างกล่อง */
+  .ack-box .ack-sign{ display:flex; flex-wrap:wrap; align-items:baseline; gap:0 4px; text-align:left; margin:10px 0 2px 0; }
+  .ack-box .ack-sign .sign-wrap{ flex:1 1 auto; }
+  .ack-box .ack-sign .fill{ min-width:0; width:100%; }
   /* ตัวเลือกชื่อ/ลายเซ็น ในกล่องรับทราบ ให้ลงบรรทัดใหม่ ไม่ดัน "ลงชื่อ" */
-  .ack-box .picker-group{ display:flex; white-space:normal; gap:3px; margin-top:4px; }
+  .ack-box .picker-group{ flex:1 1 100%; display:flex; white-space:normal; gap:3px; margin-top:4px; }
   .ack-box .sign-img{ max-height:22px; max-width:150px; }
   .ack-box .ack-role{ font-size:11.5px; }
   .ack-box .ack-date{ margin-top:14px; }
@@ -653,12 +655,9 @@ function buildChecklist(){
     } else if(row.type === 'other'){
       html += `<tr>
         <td class="col-no">${row.no}</td>
-        <td class="item">${row.text}
+        <td class="item" colspan="4">${row.text}
           <input class="fill other-line" data-field="${row.id}">
           <input class="fill other-line" data-field="${row.id}b"></td>
-        <td class="col-st"></td>
-        <td class="col-st"></td>
-        <td class="col-note"></td>
       </tr>`;
     } else {
       html += `<tr>
