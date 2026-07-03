@@ -57,57 +57,111 @@
     flex-direction:column;
   }
 
-  /* ============ แถบเครื่องมือ (ฐานข้อมูล) — ไม่พิมพ์ ============ */
-  .toolbar{
+  /* ============ เมนูเครื่องมือ (ฐานข้อมูล) — ไม่พิมพ์ ============ */
+  .menu{
     width:210mm;
-    margin:0 auto 16px auto;
-    background:#1f2933;
-    color:#fff;
-    border-radius:8px;
-    padding:12px 16px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
+    max-width:96vw;
+    margin:0 auto 18px auto;
+    border-radius:14px;
+    overflow:hidden;
+    background:#eef2f7;
+    box-shadow:0 10px 30px rgba(13,59,102,.22);
+    border:1px solid #d6deea;
   }
-  .toolbar h2{
-    font-size:14px;
-    margin:0 12px 0 0;
-    font-weight:600;
-    flex:0 0 100%;
-  }
-  .toolbar button, .toolbar select{
-    font-family:inherit;
-    font-size:13px;
-    padding:6px 12px;
-    border-radius:6px;
-    border:1px solid #3a4754;
-    cursor:pointer;
-  }
-  .toolbar button{
-    background:#0d3b66;
-    color:#fff;
-    border-color:#0d3b66;
-  }
-  .toolbar button:hover{ background:#155090; }
-  .toolbar button.danger{ background:#922; border-color:#922; }
-  .toolbar button.ghost{ background:transparent; color:#cfd6dd; }
-  .toolbar select{ background:#fff; color:#000; min-width:230px; }
-  .toolbar .spacer{ flex:1; }
-  .toolbar .hint{ font-size:11.5px; color:#9fb0c0; flex:0 0 100%; }
 
-  /* แถวพิมพ์หลายหน้า */
-  .multi-row{
-    flex:0 0 100%;
-    display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-    border-top:1px solid #3a4754; margin-top:6px; padding-top:10px;
-    font-size:13px;
+  /* แถบหัว */
+  .menu-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    flex-wrap:wrap;
+    padding:14px 20px;
+    background:linear-gradient(120deg,#0d3b66 0%,#12518f 55%,#1c6fb8 100%);
+    color:#fff;
   }
-  .multi-row select{ min-width:auto; }
-  .multi-row input[type="number"]{
-    font-family:inherit; font-size:13px; padding:5px 8px;
-    border-radius:6px; border:1px solid #3a4754; background:#fff; color:#000;
+  .menu-brand{ display:flex; align-items:center; gap:14px; }
+  .menu-logo{
+    font-size:26px; line-height:1;
+    background:rgba(255,255,255,.15);
+    width:48px; height:48px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
   }
+  .menu-name{ font-size:18px; font-weight:700; letter-spacing:.2px; }
+  .menu-sub{ font-size:12.5px; color:#cfe0f2; margin-top:2px; }
+  .menu-quick{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* แผงเครื่องมือ */
+  .panels{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    padding:16px 20px;
+  }
+  @media (max-width:900px){ .panels{ grid-template-columns:1fr; } }
+  .panel{
+    background:#fff;
+    border:1px solid #dbe3ee;
+    border-radius:12px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .panel-head{
+    margin:0;
+    font-size:13.5px; font-weight:700;
+    color:#0d3b66;
+    padding:10px 14px;
+    background:#f3f7fc;
+    border-bottom:1px solid #e2e9f2;
+  }
+  .panel-body{ padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+
+  .fld{ display:flex; flex-direction:column; gap:4px; }
+  .fld-label{ font-size:11.5px; color:#5a6b7e; font-weight:600; }
+  .btn-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+  /* input / select ในเมนู */
+  .menu select, .menu input[type="text"], .menu input[type="number"]{
+    font-family:inherit; font-size:13px;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #c2cede;
+    background:#fff; color:#12212f;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .menu select{ width:100%; cursor:pointer; }
+  .menu select:focus, .menu input:focus{ border-color:#1c6fb8; box-shadow:0 0 0 3px rgba(28,111,184,.15); }
+  .menu .num{ width:64px; text-align:center; }
+  .menu .grow{ flex:1; min-width:120px; }
+
+  /* ปุ่ม */
+  .btn{
+    font-family:inherit; font-size:13px; font-weight:600;
+    padding:8px 14px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .05s, filter .15s, background .15s;
+    white-space:nowrap;
+  }
+  .btn:hover{ filter:brightness(1.06); }
+  .btn:active{ transform:translateY(1px); }
+  .btn.block{ width:100%; }
+  .btn-primary{ background:#0d3b66; color:#fff; }
+  .btn-soft{ background:#e6eef8; color:#0d3b66; border-color:#cddcf0; }
+  .btn-ghost{ background:#fff; color:#3a4a5c; border-color:#cfd8e3; }
+  .btn-danger{ background:#b3261e; color:#fff; }
+  .menu-quick .btn{ box-shadow:0 2px 6px rgba(0,0,0,.18); }
+  .menu-quick .btn-primary{ background:#fff; color:#0d3b66; }
+  .menu-quick .btn-soft{ background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.35); }
+
+  .menu-foot{
+    font-size:11.5px; color:#5a6b7e; line-height:1.5;
+    padding:10px 20px 16px;
+    border-top:1px solid #e2e9f2;
+    background:#f7f9fc;
+  }
+
+  /* ============ ตัวเลือกชื่อ / ลายเซ็น ในฟอร์ม ============ */
+  .picker-group{ display:inline-flex; gap:3px; vertical-align:middle; }
 
   /* ============ หัวเอกสาร ============ */
   .doc-title{
@@ -258,17 +312,17 @@
     pointer-events:none;
   }
   .sign-img.show{ display:block; }
-  /* ตัวเลือกลายเซ็นในฟอร์ม (ไม่พิมพ์) */
-  select.sign-picker{
+  /* ตัวเลือกชื่อ/ลายเซ็นในฟอร์ม (ไม่พิมพ์) */
+  select.sign-picker, select.name-picker{
     font-family:inherit;
     font-size:10.5px;
-    color:#0d3b66;
-    border:1px solid #bcd;
     border-radius:4px;
-    background:#f2f7ff;
-    max-width:120px;
+    max-width:110px;
     vertical-align:middle;
+    cursor:pointer;
   }
+  select.name-picker{ color:#0d3b66; border:1px solid #bcd; background:#eef5ff; }
+  select.sign-picker{ color:#7a4a00; border:1px solid #e0c58a; background:#fff7e8; }
 
   /* ภาชนะพิมพ์หลายหน้า — ซ่อนบนจอเสมอ */
   #multiPrint{ display:none; }
@@ -309,54 +363,100 @@
 <!-- ========================================================= -->
 <!-- แถบเครื่องมือฐานข้อมูล (เก็บ/ดึงข้อมูล) — ไม่แสดงตอนพิมพ์ -->
 <!-- ========================================================= -->
-<div class="toolbar no-print">
-  <h2>📋 ระบบสมุดรายงานผลการปฏิบัติหน้าที่ — จัดเก็บฐานข้อมูล</h2>
+<div class="menu no-print">
 
-  <label style="font-size:13px;">เลือกรายงานที่บันทึกไว้:</label>
-  <select id="recordSelect"><option value="">— ยังไม่ได้เลือก —</option></select>
-  <button id="btnLoad" type="button">↧ ดึงข้อมูล</button>
-  <button id="btnDelete" type="button" class="danger">🗑 ลบ</button>
-
-  <span class="spacer"></span>
-
-  <button id="btnSave" type="button">💾 บันทึกลงฐานข้อมูล</button>
-  <button id="btnNew" type="button" class="ghost">＋ ฟอร์มใหม่</button>
-  <button id="btnExport" type="button" class="ghost">⤓ ส่งออก JSON</button>
-  <button id="btnImport" type="button" class="ghost">⤒ นำเข้า JSON</button>
-  <button id="btnPrint" type="button">🖨 พิมพ์ / บันทึก PDF</button>
-  <input type="file" id="fileImport" accept="application/json" style="display:none">
-
-  <!-- ===== พิมพ์หลายหน้า ===== -->
-  <div class="multi-row">
-    <strong>🗓 พิมพ์หลายหน้า:</strong>
-    <select id="multiMode">
-      <option value="month">ทั้งเดือน (วันละ ๑ แผ่น)</option>
-      <option value="range">ช่วงวันที่ (จาก–ถึง)</option>
-      <option value="copies">จำนวนสำเนา (เหมือนกันทุกแผ่น)</option>
-    </select>
-    <span id="wrapRange" style="display:none;">
-      ตั้งแต่วันที่ <input id="rangeFrom" type="number" min="1" max="31" value="1" style="width:60px">
-      ถึง <input id="rangeTo" type="number" min="1" max="31" value="15" style="width:60px">
-    </span>
-    <span id="wrapCopies" style="display:none;">
-      จำนวน <input id="copiesCount" type="number" min="1" max="366" value="30" style="width:70px"> แผ่น
-    </span>
-    <button id="btnPrintMulti" type="button">🖨 พิมพ์หลายหน้า</button>
+  <!-- แถบหัวเมนู -->
+  <div class="menu-bar">
+    <div class="menu-brand">
+      <span class="menu-logo">📋</span>
+      <div class="menu-titles">
+        <div class="menu-name">ระบบสมุดรายงานผลการปฏิบัติหน้าที่</div>
+        <div class="menu-sub">จนท.สารสนเทศข้อมูลข่าวอากาศ ฯ · จัดเก็บฐานข้อมูล</div>
+      </div>
+    </div>
+    <div class="menu-quick">
+      <button id="btnSave"  type="button" class="btn btn-primary">💾 บันทึก</button>
+      <button id="btnPrint" type="button" class="btn btn-primary">🖨 พิมพ์ / PDF</button>
+      <button id="btnNew"   type="button" class="btn btn-soft">＋ ฟอร์มใหม่</button>
+    </div>
   </div>
 
-  <!-- ===== คลังรายชื่อ / ลายเซ็น เจ้าหน้าที่ ===== -->
-  <div class="multi-row">
-    <strong>👤 รายชื่อเจ้าหน้าที่:</strong>
-    <input id="officerNameInput" type="text" placeholder="ยศ ชื่อ-สกุล" style="min-width:200px">
-    <button id="btnAddOfficer" type="button">＋ เพิ่มรายชื่อ</button>
-    <select id="officerSelect" style="min-width:220px"></select>
-    <button id="btnUploadSign" type="button">🖊 อัพโหลดลายเซ็น</button>
-    <button id="btnDeleteSign" type="button" class="ghost">ลบลายเซ็น</button>
-    <button id="btnDeleteOfficer" type="button" class="danger">🗑 ลบรายชื่อ</button>
-    <input type="file" id="signFile" accept="image/*" style="display:none">
+  <!-- แผงเครื่องมือ 3 กลุ่ม -->
+  <div class="panels">
+
+    <!-- กลุ่ม 1: ฐานข้อมูล -->
+    <section class="panel">
+      <h3 class="panel-head">💾 ฐานข้อมูลรายงาน</h3>
+      <div class="panel-body">
+        <label class="fld">
+          <span class="fld-label">รายงานที่บันทึกไว้</span>
+          <select id="recordSelect"><option value="">— ยังไม่ได้เลือก —</option></select>
+        </label>
+        <div class="btn-row">
+          <button id="btnLoad"   type="button" class="btn btn-soft">↧ ดึงข้อมูล</button>
+          <button id="btnDelete" type="button" class="btn btn-danger">🗑 ลบ</button>
+        </div>
+        <div class="btn-row">
+          <button id="btnExport" type="button" class="btn btn-ghost">⤓ ส่งออก JSON</button>
+          <button id="btnImport" type="button" class="btn btn-ghost">⤒ นำเข้า JSON</button>
+        </div>
+        <input type="file" id="fileImport" accept="application/json" style="display:none">
+      </div>
+    </section>
+
+    <!-- กลุ่ม 2: การพิมพ์ -->
+    <section class="panel">
+      <h3 class="panel-head">🖨 การพิมพ์หลายหน้า</h3>
+      <div class="panel-body">
+        <label class="fld">
+          <span class="fld-label">รูปแบบการพิมพ์</span>
+          <select id="multiMode">
+            <option value="month">ทั้งเดือน (วันละ ๑ แผ่น)</option>
+            <option value="range">ช่วงวันที่ (จาก–ถึง)</option>
+            <option value="copies">จำนวนสำเนา (เหมือนกันทุกแผ่น)</option>
+          </select>
+        </label>
+        <div id="wrapRange" class="btn-row" style="display:none;">
+          <span class="fld-label">วันที่</span>
+          <input id="rangeFrom" type="number" min="1" max="31" value="1" class="num">
+          <span>–</span>
+          <input id="rangeTo" type="number" min="1" max="31" value="15" class="num">
+        </div>
+        <div id="wrapCopies" class="btn-row" style="display:none;">
+          <span class="fld-label">จำนวน</span>
+          <input id="copiesCount" type="number" min="1" max="366" value="30" class="num"> <span>แผ่น</span>
+        </div>
+        <button id="btnPrintMulti" type="button" class="btn btn-primary block">🖨 พิมพ์หลายหน้า</button>
+      </div>
+    </section>
+
+    <!-- กลุ่ม 3: รายชื่อ / ลายเซ็น -->
+    <section class="panel">
+      <h3 class="panel-head">👤 รายชื่อ / ลายเซ็น เจ้าหน้าที่</h3>
+      <div class="panel-body">
+        <div class="btn-row">
+          <input id="officerNameInput" type="text" placeholder="ยศ ชื่อ-สกุล" class="grow">
+          <button id="btnAddOfficer" type="button" class="btn btn-primary">＋ เพิ่ม</button>
+        </div>
+        <label class="fld">
+          <span class="fld-label">เลือกเจ้าหน้าที่</span>
+          <select id="officerSelect"></select>
+        </label>
+        <div class="btn-row">
+          <button id="btnUploadSign"   type="button" class="btn btn-soft">🖊 อัพโหลดลายเซ็น</button>
+          <button id="btnDeleteSign"   type="button" class="btn btn-ghost">ลบลายเซ็น</button>
+          <button id="btnDeleteOfficer" type="button" class="btn btn-danger">🗑 ลบรายชื่อ</button>
+        </div>
+        <input type="file" id="signFile" accept="image/*" style="display:none">
+      </div>
+    </section>
   </div>
 
-  <div class="hint">บันทึกข้อมูลในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล สามารถบันทึก ดึงกลับมาแก้ไข และส่งออกเป็นไฟล์ JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้ · โหมด "พิมพ์หลายหน้า" จะทำสำเนาฟอร์มปัจจุบันหลายแผ่น (โหมดทั้งเดือน/ช่วงวันที่จะเติมวันที่ในช่อง "เมื่อวันที่" ให้อัตโนมัติตามเดือนที่เลือก)</div>
+  <div class="menu-foot">
+    💡 ข้อมูลถูกเก็บในเครื่อง (localStorage) ทำหน้าที่เป็นฐานข้อมูล — บันทึก/ดึงกลับมาแก้ไข/ส่งออก JSON เพื่อย้ายเข้าฐานข้อมูลส่วนกลางได้ ·
+    "พิมพ์หลายหน้า" ทำสำเนาฟอร์มปัจจุบัน (โหมดเดือน/ช่วงวันที่เติมวันที่อัตโนมัติ) ·
+    ในฟอร์มมีเมนู <b>ชื่อ</b> และ <b>ลายเซ็น</b> แยกกันที่แต่ละช่องลงชื่อ
+  </div>
 </div>
 
 <!-- ========================================================= -->
@@ -369,7 +469,7 @@
 
   <p class="lead indent">
     กระผม <input class="fill name" data-field="officerName" placeholder="ยศ–ชื่อ–สกุล">
-    <select class="sign-picker no-print" data-target="officerName"></select>
+    <select class="name-picker no-print" data-target="officerName" title="เลือกชื่อจากคลัง"></select>
     ได้รับมอบหน้าที่ จนท.สารสนเทศข้อมูลข่าวอากาศ
   </p>
   <p class="lead">
@@ -407,6 +507,7 @@
   <p class="lead">
     กระผมได้มอบหน้าที่ความรับผิดชอบให้กับ
     <input class="fill name" data-field="receiverName" placeholder="ยศ–ชื่อ–สกุล ผู้รับมอบ">
+    <select class="name-picker no-print" data-target="receiverName" title="เลือกชื่อจากคลัง"></select>
     เพื่อปฏิบัติหน้าที่ต่อไป
   </p>
 
@@ -419,14 +520,20 @@
           <img class="sign-img" data-signimg="signSender" alt="">
           <input class="fill sign-name" data-field="signSender" placeholder="ผู้ส่ง">
         </span> ผู้ส่ง
-        <select class="sign-picker no-print" data-target="signSender"></select>
+        <span class="picker-group no-print">
+          <select class="name-picker" data-target="signSender" title="เลือกชื่อ"></select>
+          <select class="sign-picker" data-target="signSender" title="เลือกลายเซ็น"></select>
+        </span>
       </div>
       <div class="sign-line">ลงชื่อ
         <span class="sign-wrap">
           <img class="sign-img" data-signimg="signReceiver" alt="">
           <input class="fill sign-name" data-field="signReceiver" placeholder="ผู้รับ">
         </span> ผู้รับ
-        <select class="sign-picker no-print" data-target="signReceiver"></select>
+        <span class="picker-group no-print">
+          <select class="name-picker" data-target="signReceiver" title="เลือกชื่อ"></select>
+          <select class="sign-picker" data-target="signReceiver" title="เลือกลายเซ็น"></select>
+        </span>
       </div>
     </div>
   </div>
@@ -440,7 +547,10 @@
           <img class="sign-img" data-signimg="ack1Sign" alt="">
           <input class="fill sign-name" data-field="ack1Sign">
         </span>
-        <select class="sign-picker no-print" data-target="ack1Sign"></select>
+        <span class="picker-group no-print">
+          <select class="name-picker" data-target="ack1Sign" title="เลือกชื่อ"></select>
+          <select class="sign-picker" data-target="ack1Sign" title="เลือกลายเซ็น"></select>
+        </span>
       </div>
       <div class="ack-role">น.สารสนเทศ.ผสท.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack1Date" value="........./เม.ย./๖๙"></div>
@@ -452,7 +562,10 @@
           <img class="sign-img" data-signimg="ack2Sign" alt="">
           <input class="fill sign-name" data-field="ack2Sign">
         </span>
-        <select class="sign-picker no-print" data-target="ack2Sign"></select>
+        <span class="picker-group no-print">
+          <select class="name-picker" data-target="ack2Sign" title="เลือกชื่อ"></select>
+          <select class="sign-picker" data-target="ack2Sign" title="เลือกลายเซ็น"></select>
+        </span>
       </div>
       <div class="ack-role">หน.ผสท.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack2Date" value="........./เม.ย./๖๙"></div>
@@ -464,7 +577,10 @@
           <img class="sign-img" data-signimg="ack3Sign" alt="">
           <input class="fill sign-name" data-field="ack3Sign">
         </span>
-        <select class="sign-picker no-print" data-target="ack3Sign"></select>
+        <span class="picker-group no-print">
+          <select class="name-picker" data-target="ack3Sign" title="เลือกชื่อ"></select>
+          <select class="sign-picker" data-target="ack3Sign" title="เลือกลายเซ็น"></select>
+        </span>
       </div>
       <div class="ack-role">ผอ.กขอ.คปอ.</div>
       <div class="ack-date"><input class="fill" data-field="ack3Date" value="........./เม.ย./๖๙"></div>
@@ -630,30 +746,34 @@ function refreshOfficers(keepId){
     list.map(o=>`<option value="${o.id}">${o.sign ? '🖊 ' : ''}${o.name}</option>`).join('');
   if(cur && list.some(o=>o.id===cur)) mgr.value = cur;
 
-  // ตัวเลือกลายเซ็นในฟอร์ม (ทุกช่อง)
+  // ตัวเลือก "ชื่อ" ในฟอร์ม (ทุกช่อง) — รายชื่อทั้งหมด
+  document.querySelectorAll('select.name-picker').forEach(sel=>{
+    sel.innerHTML = '<option value="">— เลือกชื่อ —</option>' +
+      list.map(o=>`<option value="${o.id}">${o.name}</option>`).join('') +
+      (list.length ? '<option value="__clear__">— ล้างชื่อ —</option>' : '');
+  });
+
+  // ตัวเลือก "ลายเซ็น" ในฟอร์ม — เฉพาะคนที่มีลายเซ็น
+  const withSign = list.filter(o=>o.sign);
   document.querySelectorAll('select.sign-picker').forEach(sel=>{
-    const prev = sel.value;
-    sel.innerHTML = '<option value="">— เลือกชื่อ/ลายเซ็น —</option>' +
-      list.map(o=>`<option value="${o.id}">${o.sign ? '🖊 ' : ''}${o.name}</option>`).join('') +
-      '<option value="__clear__">— ล้างช่องนี้ —</option>';
-    if(prev && list.some(o=>o.id===prev)) sel.value = prev;
+    sel.innerHTML = '<option value="">— เลือกลายเซ็น —</option>' +
+      withSign.map(o=>`<option value="${o.id}">🖊 ${o.name}</option>`).join('') +
+      (withSign.length ? '<option value="__clear__">— ล้างลายเซ็น —</option>' : '');
   });
 }
 
 /* วางชื่อ + ลายเซ็นของเจ้าหน้าที่ลงในช่องเป้าหมาย (target = data-field) */
-function stampSignature(target, officer, root=document){
+/* วางเฉพาะ "ชื่อ" ลงในช่องเป้าหมาย (target = data-field) */
+function stampName(target, officer, root=document){
   const input = root.querySelector(`[data-field="${target}"]`);
-  const img   = root.querySelector(`img[data-signimg="${target}"]`);
-  if(!officer){                       // ล้างช่อง
-    if(input) input.value = '';
-    if(img){ img.removeAttribute('src'); img.classList.remove('show'); }
-    return;
-  }
-  if(input) input.value = officer.name;
-  if(img){
-    if(officer.sign){ img.src = officer.sign; img.classList.add('show'); }
-    else { img.removeAttribute('src'); img.classList.remove('show'); }
-  }
+  if(input) input.value = officer ? officer.name : '';
+}
+/* วางเฉพาะ "ลายเซ็น" (รูปภาพ) ลงในช่องเป้าหมาย */
+function stampSign(target, officer, root=document){
+  const img = root.querySelector(`img[data-signimg="${target}"]`);
+  if(!img) return;
+  if(officer && officer.sign){ img.src = officer.sign; img.classList.add('show'); }
+  else { img.removeAttribute('src'); img.classList.remove('show'); }
 }
 
 /* ---------- รวบรวมข้อมูลจากฟอร์มเป็นอ็อบเจกต์ (root = ขอบเขตที่อ่าน) ---------- */
@@ -852,13 +972,22 @@ function bindUI(){
     if(confirm('ลบเฉพาะลายเซ็นของเจ้าหน้าที่คนนี้?')) setOfficerSign(id, null);
   });
 
-  // ตัวเลือกลายเซ็นในฟอร์ม — เลือกแล้ววางชื่อ+ลายเซ็นลงช่อง
+  // ตัวเลือก "ชื่อ" — วางเฉพาะชื่อ
+  document.querySelectorAll('select.name-picker').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const t = sel.dataset.target;
+      if(sel.value === '__clear__') stampName(t, null);
+      else if(sel.value) stampName(t, offFind(sel.value));
+      sel.value = '';
+    });
+  });
+  // ตัวเลือก "ลายเซ็น" — วางเฉพาะลายเซ็น
   document.querySelectorAll('select.sign-picker').forEach(sel=>{
     sel.addEventListener('change', ()=>{
-      const target = sel.dataset.target;
-      if(sel.value === '__clear__'){ stampSignature(target, null); }
-      else if(sel.value){ stampSignature(target, offFind(sel.value)); }
-      sel.value = '';   // รีเซ็ตกลับเป็นหัวข้อ
+      const t = sel.dataset.target;
+      if(sel.value === '__clear__') stampSign(t, null);
+      else if(sel.value) stampSign(t, offFind(sel.value));
+      sel.value = '';
     });
   });
 }
